@@ -22,8 +22,7 @@ const SingInForm = () => {
         setPassword("");
       })
       .catch((err) => {
-        if (err.response.data.message === "email must be unique")
-          alert("User Already Exist");
+          alert(err.response.data.message);
         console.log(err);
       });
   };
