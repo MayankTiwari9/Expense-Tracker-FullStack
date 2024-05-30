@@ -1,14 +1,12 @@
-import React from 'react'
-import ExpenseForm from '../ExpenseForm/ExpenseForm'
-import ExpenseList from '../ExpenseList/ExpenseList'
+import React from "react";
+import ExpenseList from "../ExpenseList/ExpenseList";
 
 const Home = () => {
   return (
     <div>
-      <ExpenseForm/>
-      <ExpenseList/>
+      <ExpenseList />
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

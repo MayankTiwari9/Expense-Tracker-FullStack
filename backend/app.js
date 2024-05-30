@@ -6,8 +6,8 @@ const app = express();
 
 const sequelize = require("./config/database");
 
-const authRoutes = require('./routes/authenticationRoutes'); 
-const expenseRoutes = require('./routes/expenseRoutes');
+const authRoutes = require("./routes/authenticationRoutes");
+const expenseRoutes = require("./routes/expenseRoutes");
 
 app.use(
   cors({
@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use(authRoutes);
-app.use(expenseRoutes); 
+app.use("/expense", expenseRoutes);
 
 const PORT = 3001;
 

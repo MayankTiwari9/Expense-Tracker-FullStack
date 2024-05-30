@@ -1,7 +1,8 @@
 import axios from "axios";
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
-const ExpenseForm = () => {
+const ExpenseForm = ({ fetchAllExpenses }) => {
   const [amount, setAmount] = useState();
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
@@ -13,61 +14,107 @@ const ExpenseForm = () => {
       amount,
       description,
       category,
-    }
+    };
 
     axios
       .post("http://localhost:3001/expense/addexpense", expenseData)
       .then((res) => {
         console.log(res);
+        toast.success(res.data.message);
+        fetchAllExpenses();
+        setAmount("");
+        setDescription("");
+        setCategory("");
       })
       .catch((err) => {
         console.log(err);
-      });  
+      });
   };
 
   return (
-    <div>
-      <form onSubmit={expenseFormSubmitHandler}>
-        <div>
-          <label>Expense Amount</label>
-          <input
-            type="number"
-            name="amount"
-            placeholder="Enter Amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            required
-          />
-        </div>
-        <div>
-          <label>Expense Description</label>
-          <input
-            type="text"
-            name="description"
-            placeholder="Enter Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            required
-          />
-        </div>
-        <div>
-          <label>Expense Category</label>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="block w-1/4 rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            required
-          >
-            <option value="">Select a category</option>
-            <option value="Fuel">Fuel</option>
-            <option value="Food">Food</option>
-            <option value="Rent">Rent</option>
-          </select>
-        </div>
-        <button type="submit">Add Expense</button>
-      </form>
+    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+      <div className="mt-10 sm:w-full sm:max-w-prose">
+        <form
+          onSubmit={expenseFormSubmitHandler}
+          className="space-y-6"
+          action="#"
+          method="POST"
+        >
+          <div>
+            <label
+              htmlFor="amount"
+              className="block text-sm font-medium leading-6 text-gray-900"
+            >
+              Expense Amount
+            </label>
+            <div className="mt-2">
+              <input
+                id="amount"
+                name="amount"
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="Enter Amount"
+                required
+                className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+          <div>
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium leading-6 text-gray-900"
+            >
+              Expense Description
+            </label>
+            <div className="mt-2">
+              <input
+                id="description"
+                name="description"
+                type="texxt"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Enter Description"
+                required
+                className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between">
+              <label
+                htmlFor="category"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                Expense Category
+              </label>
+            </div>
+            <div className="mt-2">
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="block w-1/4 rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                required
+              >
+                <option value="">Select a category</option>
+                <option value="Fuel">Fuel</option>
+                <option value="Food">Food</option>
+                <option value="Rent">Rent</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+              Add Expense
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
