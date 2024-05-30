@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const SignUpForm = () => {
   const [name, setName] = useState("");
@@ -33,7 +34,7 @@ const SignUpForm = () => {
 
   return (
     <form onSubmit={formSubmitHandler}>
-      <div className="border border-gray-900/10 mt-10 p-6 w-1/4 max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-4xl mx-auto flex flex-col justify-center">
+      <div className="border border-gray-900/10 mt-10 p-6 w-full sm:w-1/4 max-w-md mx-auto flex flex-col justify-center">
         <h1 className="text-2xl font-semibold leading-7 text-gray-900 mx-auto">
           Sign Up
         </h1>
@@ -52,8 +53,9 @@ const SignUpForm = () => {
                 name="name"
                 id="name"
                 value={name}
+                placeholder="Your name"
                 onChange={(e) => setName(e.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 required
               />
             </div>
@@ -72,8 +74,9 @@ const SignUpForm = () => {
                 name="email"
                 id="email"
                 value={email}
+                placeholder="Your email"
                 onChange={(e) => setEmail(e.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 required
               />
             </div>
@@ -92,8 +95,9 @@ const SignUpForm = () => {
                 name="password"
                 type="password"
                 value={password}
+                placeholder="Password"
                 onChange={(e) => setPassword(e.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 required
               />
             </div>
@@ -105,7 +109,9 @@ const SignUpForm = () => {
         >
           Sign Up
         </button>
+      <Link className="mt-4" to={'/signin'}>Already have an account ? <span className="text-indigo-600 font-bold">Login here</span></Link>
       </div>
+      
     </form>
   );
 };
