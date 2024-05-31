@@ -1,7 +1,12 @@
 const User = require('../models/users');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+require('dotenv').config();
 
-exports.postSignUpUser = async (req, res, next) => {
+const JWT_SECRET = process.env.JWT_SECRET
+
+exports.postSignUpUser = async (req, res, next) => {    
     const { name, email, password } = req.body;
 
     try {
@@ -40,7 +45,13 @@ exports.postLogInUser = async (req, res, next) => {
             return res.status(401).json({ message: "Incorrect password" });
         }
 
-        res.status(200).json({ message: "User login successful", user });
+        const token = jwt.sign(
+            { userId: user.id },
+            JWT_SECRET
+        );
+
+
+        res.status(200).json({ message: "User login successful", user, token });
     } catch (err) {
         res.status(500).json({ message: "Server error", error: err.message });
     }

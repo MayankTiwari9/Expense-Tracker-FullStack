@@ -21,6 +21,7 @@ const SingInForm = () => {
       .then((res) => {
         console.log(res);
         toast.success(res.data.message);
+        localStorage.setItem('token', res.data.token);
         setEmail("");
         setPassword("");
         navigate("/home");

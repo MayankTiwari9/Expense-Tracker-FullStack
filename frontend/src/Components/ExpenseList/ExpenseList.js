@@ -6,9 +6,11 @@ const ExpenseList = () => {
   const [expenses, setExpenses] = useState([]);
 
   const fetchAllExpenses = async () => {
+    const token = localStorage.getItem("token");
     try {
       const response = await axios.get(
-        "http://localhost:3001/expense/allexpenses"
+        "http://localhost:3001/expense/allexpenses",
+        { headers: { Authorization: token } }
       );
       const data = response.data;
       setExpenses(data.expenses);
