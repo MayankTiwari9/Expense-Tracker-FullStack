@@ -39,7 +39,7 @@ Order.belongsTo(User);
 
 sequelize
   .sync(
-    {force: true}
+    // {force: true}
   )
   .then(
     app.listen(PORT, () => {

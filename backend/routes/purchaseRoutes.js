@@ -1,6 +1,7 @@
 const express = require("express");
 
 const purchaseController = require("../controllers/purchaseController");
+const userController = require('../controllers/userController');
 
 const authenticate = require("../auth/authenticate");
 
@@ -13,5 +14,6 @@ router.get(
 );
 
 router.post('/updateTransactionStatus', authenticate, purchaseController.updateTransactionStatus);
+router.get('/user/status', authenticate, userController.getUserStatus);
 
 module.exports = router;

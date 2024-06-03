@@ -9,11 +9,10 @@ const ExpenseForm = ({ fetchAllExpenses }) => {
   const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
-    // Check if the user is a premium member
     const token = localStorage.getItem("token");
 
     axios
-      .get("http://localhost:3001/user/status", {
+      .get("http://localhost:3001/purchase/user/status", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -56,10 +55,34 @@ const ExpenseForm = ({ fetchAllExpenses }) => {
       });
   };
 
+  function loadScript(src) {
+    return new Promise((resolve) => {
+        const script = document.createElement("script");
+        script.src = src;
+        script.onload = () => {
+            resolve(true);
+        };
+        script.onerror = () => {
+            resolve(false);
+        };
+        document.body.appendChild(script);
+    });
+}
+
   const premiumMembershipHandler = async (e) => {
+
+    const res = await loadScript(
+      "https://checkout.razorpay.com/v1/checkout.js"
+  );
+
+  if (!res) {
+    alert("Razorpay SDK failed to load. Are you online?");
+    return;
+}
+
     const token = localStorage.getItem("token");
 
-    const result = await axios.get(
+    const response = await axios.get(
       "http://localhost:3001/purchase/premiumMembership",
       {
         headers: {
@@ -68,16 +91,16 @@ const ExpenseForm = ({ fetchAllExpenses }) => {
       }
     );
 
-    console.log(result);
+    console.log(response);
 
-    if (!result) {
+    if (!response) {
       alert("Server error. Please try again later.");
       return;
     }
 
-    const { id: order_id } = result.data.order;
+    const { id: order_id } = response.data.order;
     const options = {
-      key: result.data.key_id,
+      key: response.data.key_id,
       order_id: order_id,
       handler: async function (response) {
         const data = {
@@ -85,7 +108,7 @@ const ExpenseForm = ({ fetchAllExpenses }) => {
           payment_id: response.razorpay_payment_id,
         };
 
-        const result = await axios.post(
+        await axios.post(
           "http://localhost:3001/purchase/updateTransactionStatus",
           data,
           {
@@ -94,8 +117,6 @@ const ExpenseForm = ({ fetchAllExpenses }) => {
             },
           }
         );
-
-        console.log(result);
 
         toast.success("You are now a premium user");
         setIsPremium(true);
@@ -116,6 +137,7 @@ const ExpenseForm = ({ fetchAllExpenses }) => {
     const paymentObject = new window.Razorpay(options);
     paymentObject.open();
   };
+
 
   return (
     <div className="flex min-h-full flex-1 flex-row justify-between px-6 py-12 lg:px-8">
@@ -202,14 +224,16 @@ const ExpenseForm = ({ fetchAllExpenses }) => {
         </form>
       </div>
       <div>
-        {!isPremium && (
+        {!isPremium ? (
           <button
-            onClick={premiumMembershipHandler}  
+            onClick={premiumMembershipHandler}
             type="button"
             className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Buy Premium Membership
           </button>
+        ) : (
+          <p>You are a Premium User now</p>
         )}
       </div>
     </div>

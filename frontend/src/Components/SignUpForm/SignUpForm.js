@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const SignUpForm = () => {
   const [name, setName] = useState("");
@@ -20,14 +21,14 @@ const SignUpForm = () => {
       .post("http://localhost:3001/users/signup", formData)
       .then((res) => {
         console.log(res);
-        alert(res.data.message);
+        toast.success(res.data.message);
         setName("");
         setEmail("");
         setPassword("");
       })
       .catch((err) => {
-        if (err.response.data.message === "email must be unique")
-          alert("User Already Exist");
+        // if (err.response.data.message === "email must be unique")
+          toast.error(err.response.data.message);
         console.log(err);
       });
   };

@@ -14,12 +14,14 @@ exports.purchasePremium = async (req, res, next) => {
         return res.status(500).json({ message: "Razorpay order creation failed", error: err });
       }
 
-      try {
-        await req.user.createOrder({ orderid: order.id, status: "PENDING" });
-        return res.status(201).json({ order, key_id: rzp.key_id });
-      } catch (err) {
-        return res.status(500).json({ message: "Database operation failed", error: err });
-      }
+        req.user.createOrder({ orderid: order.id, status: "PENDING" }).then(() => {
+          return res.status(201).json({ order, key_id: rzp.key_id });
+        })
+        .catch((err) => {
+          throw new Error(err);
+        })
+       
+      
     });
   } catch (err) {
     console.log(err);
@@ -27,31 +29,34 @@ exports.purchasePremium = async (req, res, next) => {
   }
 };
 
-exports.updateTransactionStatus = async (req, res, next) => {
-  const { payment_id, order_id, status } = req.body;
-
+exports.updateTransactionStatus =  (req, res, next) => {
+  
   try {
-    const order = await Order.findOne({ where: { orderid: order_id } });
-
-    if (!order) {
-      return res.status(404).json({ message: "Order not found" });
-    }
-
-    const updateOrderStatus = order.update({
-      paymentid: payment_id,
-      status: status === "SUCCESS" ? "SUCCESSFULL" : "FAILED",
-    });
-
-    const updateUserStatus = status === "SUCCESS"
-      ? req.user.update({ ispremiumuser: true })
-      : Promise.resolve();
-
-    await Promise.all([updateOrderStatus, updateUserStatus]);
-
-    return res.status(202).json({
-      success: status === "SUCCESS",
-      message: status === "SUCCESS" ? "Transaction Successful" : "Transaction Failed",
-    });
+    const { payment_id, order_id } = req.body;
+    Order.findOne({ where: { orderid: order_id } }).then((order) => {
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      
+      order.update({
+        paymentid: payment_id,
+        status: "SUCCESSFUL",
+      })
+      .then(() => {
+        req.user.update({ispremiumuser: true}).then(() => {
+          return res.status(202).json({success: true, message: "Transaction Successfull"})
+        })
+        .catch((err) => {
+          throw new Error(err);
+        })
+      })
+      .catch((err) => {
+        throw new Error(err);
+      })
+    })
+    .catch((err) => {
+      throw new Error(err);
+    })
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal server error", error });
