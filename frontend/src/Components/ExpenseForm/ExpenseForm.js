@@ -1,11 +1,30 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
 const ExpenseForm = ({ fetchAllExpenses }) => {
-  const [amount, setAmount] = useState();
+  const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
+  const [isPremium, setIsPremium] = useState(false);
+
+  useEffect(() => {
+    // Check if the user is a premium member
+    const token = localStorage.getItem("token");
+
+    axios
+      .get("http://localhost:3001/user/status", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setIsPremium(res.data.isPremium);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   const expenseFormSubmitHandler = (e) => {
     e.preventDefault();
@@ -16,8 +35,14 @@ const ExpenseForm = ({ fetchAllExpenses }) => {
       category,
     };
 
+    const token = localStorage.getItem("token");
+
     axios
-      .post("http://localhost:3001/expense/addexpense", expenseData)
+      .post("http://localhost:3001/expense/addexpense", expenseData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         console.log(res);
         toast.success(res.data.message);
@@ -31,8 +56,69 @@ const ExpenseForm = ({ fetchAllExpenses }) => {
       });
   };
 
+  const premiumMembershipHandler = async (e) => {
+    const token = localStorage.getItem("token");
+
+    const result = await axios.get(
+      "http://localhost:3001/purchase/premiumMembership",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log(result);
+
+    if (!result) {
+      alert("Server error. Please try again later.");
+      return;
+    }
+
+    const { id: order_id } = result.data.order;
+    const options = {
+      key: result.data.key_id,
+      order_id: order_id,
+      handler: async function (response) {
+        const data = {
+          order_id: order_id,
+          payment_id: response.razorpay_payment_id,
+        };
+
+        const result = await axios.post(
+          "http://localhost:3001/purchase/updateTransactionStatus",
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        console.log(result);
+
+        toast.success("You are now a premium user");
+        setIsPremium(true);
+      },
+      prefill: {
+        name: "Your Name",
+        email: "email@example.com",
+        contact: "9999999999",
+      },
+      notes: {
+        address: "Razorpay Corporate Office",
+      },
+      theme: {
+        color: "#61dafb",
+      },
+    };
+
+    const paymentObject = new window.Razorpay(options);
+    paymentObject.open();
+  };
+
   return (
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+    <div className="flex min-h-full flex-1 flex-row justify-between px-6 py-12 lg:px-8">
       <div className="mt-10 sm:w-full sm:max-w-prose">
         <form
           onSubmit={expenseFormSubmitHandler}
@@ -71,7 +157,7 @@ const ExpenseForm = ({ fetchAllExpenses }) => {
               <input
                 id="description"
                 name="description"
-                type="texxt"
+                type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Enter Description"
@@ -114,6 +200,17 @@ const ExpenseForm = ({ fetchAllExpenses }) => {
             </button>
           </div>
         </form>
+      </div>
+      <div>
+        {!isPremium && (
+          <button
+            onClick={premiumMembershipHandler}  
+            type="button"
+            className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            Buy Premium Membership
+          </button>
+        )}
       </div>
     </div>
   );

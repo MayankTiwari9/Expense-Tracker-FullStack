@@ -10,16 +10,21 @@ const ExpenseList = () => {
     try {
       const response = await axios.get(
         "http://localhost:3001/expense/allexpenses",
-        { headers: { Authorization: token } }
+        { headers: { Authorization: `Bearer ${token}` } } // Add "Bearer" before the token
       );
       const data = response.data;
       setExpenses(data.expenses);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const deleteExpense = async (id) => {
+    const token = localStorage.getItem("token");
     try {
-      await axios.delete(`http://localhost:3001/expense/${id}`);
+      await axios.delete(`http://localhost:3001/expense/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       fetchAllExpenses();
     } catch (error) {
       console.log(error);
