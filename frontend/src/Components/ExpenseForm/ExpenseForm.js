@@ -57,28 +57,29 @@ const ExpenseForm = ({ fetchAllExpenses }) => {
 
   function loadScript(src) {
     return new Promise((resolve) => {
-        const script = document.createElement("script");
-        script.src = src;
-        script.onload = () => {
-            resolve(true);
-        };
-        script.onerror = () => {
-            resolve(false);
-        };
-        document.body.appendChild(script);
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+      };
+      document.body.appendChild(script);
     });
-}
+  }
 
   const premiumMembershipHandler = async (e) => {
-
+    e.preventDefault();
+    
     const res = await loadScript(
       "https://checkout.razorpay.com/v1/checkout.js"
-  );
+    );
 
-  if (!res) {
-    alert("Razorpay SDK failed to load. Are you online?");
-    return;
-}
+    if (!res) {
+      alert("Razorpay failed to load. Are you online?");
+      return;
+    }
 
     const token = localStorage.getItem("token");
 
@@ -137,7 +138,6 @@ const ExpenseForm = ({ fetchAllExpenses }) => {
     const paymentObject = new window.Razorpay(options);
     paymentObject.open();
   };
-
 
   return (
     <div className="flex min-h-full flex-1 flex-row justify-between px-6 py-12 lg:px-8">
